@@ -154,7 +154,7 @@ En clase podés decir: es una forma liviana de DI manual, alternativa a Hilt par
 
 ---
 
-**7) Puntos fuertes para defender en clase**
+**7) Puntos fuertes **
 
 1. Separación de responsabilidades clara.
 2. UI desacoplada de red y persistencia.
