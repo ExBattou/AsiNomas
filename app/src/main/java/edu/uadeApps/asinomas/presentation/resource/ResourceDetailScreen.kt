@@ -1,12 +1,12 @@
-package edu.uadeApps.asinomas.presentation.favorites
+package edu.uadeApps.asinomas.presentation.resource
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,14 +22,14 @@ import androidx.compose.ui.unit.dp
 import edu.uadeApps.asinomas.presentation.components.FavoriteRow
 
 @Composable
-fun FavoritesScreen(
-    viewModel: FavoritesViewModel,
-    onItemClick: (String) -> Unit
+fun ResourceDetailScreen(
+    resourceUrl: String,
+    viewModel: ResourceDetailViewModel
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.loadFavorites()
+    LaunchedEffect(resourceUrl) {
+        viewModel.load(resourceUrl)
     }
 
     Column(
@@ -37,33 +37,34 @@ fun FavoritesScreen(
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFF111319), Color(0xFF1B1726), Color.Black)
+                    colors = listOf(Color(0xFF0F1620), Color(0xFF1F1A2D), Color.Black)
                 )
             )
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(
-            text = "Favoritos",
-            style = MaterialTheme.typography.headlineMedium,
-            color = Color.White,
-            fontWeight = FontWeight.ExtraBold
-        )
-
         when {
             state.isLoading -> CircularProgressIndicator()
             state.error != null -> Text(text = "Error: ${state.error}", color = Color.White)
-            state.items.isEmpty() -> Text(text = "No hay favoritos guardados todavía.", color = Color.White)
             else -> {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    items(state.items, key = { it.url }) { item ->
-                        FavoriteRow(
-                            title = item.label,
-                            isFavorite = true,
-                            onClick = { onItemClick(item.url) },
-                            onFavoriteClick = { viewModel.removeFavorite(item.url) }
-                        )
-                    }
+                Text(
+                    text = state.title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+                FavoriteRow(
+                    title = "Marcar como favorito",
+                    isFavorite = state.isFavorite,
+                    onFavoriteClick = { viewModel.toggleFavorite() }
+                )
+                Text(text = "URL: ${state.url}", color = Color.White)
+                if (state.created.isNotBlank()) {
+                    Text(text = "Created: ${state.created}", color = Color.White)
+                }
+                if (state.edited.isNotBlank()) {
+                    Text(text = "Edited: ${state.edited}", color = Color.White)
                 }
             }
         }

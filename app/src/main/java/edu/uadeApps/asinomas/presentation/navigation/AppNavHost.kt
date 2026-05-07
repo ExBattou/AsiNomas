@@ -16,6 +16,8 @@ import edu.uadeApps.asinomas.presentation.favorites.FavoritesScreen
 import edu.uadeApps.asinomas.presentation.favorites.FavoritesViewModel
 import edu.uadeApps.asinomas.presentation.films.FilmsScreen
 import edu.uadeApps.asinomas.presentation.films.FilmsViewModel
+import edu.uadeApps.asinomas.presentation.resource.ResourceDetailScreen
+import edu.uadeApps.asinomas.presentation.resource.ResourceDetailViewModel
 
 @Composable
 fun AppNavHost() {
@@ -39,7 +41,16 @@ fun AppNavHost() {
 
         composable(Routes.Favorites.route) {
             val vm: FavoritesViewModel = viewModel(factory = FavoritesViewModel.Factory(repository))
-            FavoritesScreen(viewModel = vm)
+            FavoritesScreen(
+                viewModel = vm,
+                onItemClick = { url ->
+                    if (url.contains("/films/")) {
+                        navController.navigate("detail/${Uri.encode(url)}")
+                    } else {
+                        navController.navigate("resource_detail/${Uri.encode(url)}")
+                    }
+                }
+            )
         }
 
         composable(
@@ -49,6 +60,15 @@ fun AppNavHost() {
             val filmUrl = Uri.decode(backStackEntry.arguments?.getString("filmUrl") ?: "")
             val vm: FilmDetailViewModel = viewModel(factory = FilmDetailViewModel.Factory(repository))
             FilmDetailScreen(filmUrl = filmUrl, viewModel = vm)
+        }
+
+        composable(
+            route = Routes.ResourceDetail.route,
+            arguments = listOf(navArgument("resourceUrl") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val resourceUrl = Uri.decode(backStackEntry.arguments?.getString("resourceUrl") ?: "")
+            val vm: ResourceDetailViewModel = viewModel(factory = ResourceDetailViewModel.Factory(repository))
+            ResourceDetailScreen(resourceUrl = resourceUrl, viewModel = vm)
         }
     }
 }

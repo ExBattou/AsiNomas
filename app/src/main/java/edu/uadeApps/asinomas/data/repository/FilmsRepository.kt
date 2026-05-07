@@ -4,6 +4,8 @@ import edu.uadeApps.asinomas.data.local.FavoritesStore
 import edu.uadeApps.asinomas.data.network.SwapiApi
 import edu.uadeApps.asinomas.domain.Film
 import edu.uadeApps.asinomas.domain.ResourceItem
+import edu.uadeApps.asinomas.data.model.ResourceDto
+
 
 class FilmsRepository(
     private val api: SwapiApi,
@@ -55,6 +57,10 @@ class FilmsRepository(
                 ResourceItem(label = url, url = url)
             }
         }
+    }
+
+    suspend fun getResourceByUrl(url: String): ResourceDto {
+        return api.getResource(url)
     }
 
     fun isFavorite(id: String): Boolean = favoritesStore.isFavorite(id)
